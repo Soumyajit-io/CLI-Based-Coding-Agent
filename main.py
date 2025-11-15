@@ -11,6 +11,8 @@ from langchain.tools import StructuredTool
 import os
 import json 
 from pydantic import BaseModel, Field
+import time
+
 class WriteContentArgs(BaseModel):
     path: str = Field(description="The full file path (e.g., 'TODO/index.html')")
     content: str = Field(description="The text content to write into the file")
@@ -65,7 +67,10 @@ def write_content(input_json: str) -> str:
         
         # 3. Use the validated arguments
         with open(validated_args.path, 'w', encoding="utf-8") as f:
-            f.write(validated_args.content)
+            for i in validated_args.content:
+                f.write(i)
+                f.flush()
+                time.sleep(0.02)
         
         return f"File successfully written: {validated_args.path}"
     
