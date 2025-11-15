@@ -3,6 +3,8 @@ from langchain.agents import create_react_agent, AgentExecutor
 from langchain import hub
 from langchain_core.tools import tool
 from dotenv import load_dotenv
+from langchain_core.prompts import load_prompt
+
 from langchain.prompts import PromptTemplate
 load_dotenv()
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -18,7 +20,7 @@ class WriteContentArgs(BaseModel):
     content: str = Field(description="The text content to write into the file")
 
 ques = input("🤖 Enter what to create : ")
-shell_tool = ShellTool()
+prompt= load_prompt('prompt.json')
 @tool
 def create_file (path:str) -> str:
    """Creates an empty file at the specified path.
@@ -118,48 +120,6 @@ def read_file (path:str) ->str:
 
 
 llm2 = ChatOpenAI(model="gpt-4o-mini")
-llm = ChatGoogleGenerativeAI(model='gemini-2.5-flash')
-prompt = PromptTemplate.from_template("""
-You are an expert AI software developer that can create and edit files using tools.
-
-You have access to these tools:
-{tools}
-
-When using tools:
-- For tools with a single string argument (like 'create_folder', 'create_file', 'read_file', 'terminal'), provide the input as a simple, unquoted string.
-- For tools with multiple arguments (like 'write_content'), provide the input as a valid JSON string.
-- DO NOT use code fences (no triple backticks).
-
-Here are examples of correct tool calls:
-
-### Example 1: Single String Input
-Action: create_folder
-Action Input: TODO
-
-### Example 2: Single String Input (for terminal)
-Action: terminal
-Action Input: dir
-
-### Example 3: Multi-Argument/JSON Input
-Action: write_content
-Action Input: {{"path": "TODO/index.html", "content": "<!DOCTYPE html>...</html>"}}
-
-Use the following format:
-
-Question: the task or problem to solve
-Thought: explain what needs to be done
-Action: the action to take, one of [{tool_names}]
-Action Input: the input for that action
-Observation: the result
-... (repeat as needed)
-Thought: I now know the final answer
-Final Answer: the final outcome or explanation
-
-Begin!
-
-Question: {input}
-{agent_scratchpad}
-""")
 
 agent = create_react_agent(
    llm = llm2,
