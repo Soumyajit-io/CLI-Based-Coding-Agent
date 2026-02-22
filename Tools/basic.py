@@ -12,39 +12,41 @@ class WriteContentArgs(BaseModel):
     content: str = Field(description="The text content to write into the file")
 
 @tool
-def create_file (path:str) -> str:
-   """Creates an empty file at the specified path.
+def create_file(path: str) -> str:
+    """
+    Creates an empty file at the specified path.
 
-    - Automatically creates parent folders if they don't exist.
+    - Does not creates parent folders if they don't exist.
     - Does NOT overwrite existing files.
     - Returns a clear success or error message.
 
-   Args:
-       path (str):The full file path (e.g., "TODO/index.html")
+    Args:
+        path (str): The full file path (e.g., "TODO/index.html")
 
-   Returns:
-       str: Message indicating success or the type of error.
-   """
-   try:
-      os.makedirs(os.path.dirname(path),exist_ok=True)
-      # Check if the file already exists
-      if os.path.exists(path):
-         return f"File already exists: {path}"
-      # Check if the file already exists
-      if os.path.exists(path):
-         return f"File already exists: {path}"
-      # Create an empty file
-      with open(path, "x", encoding="utf-8") as f:
-         pass
+    Returns:
+        str: Message indicating success or the type of error.
+    """
+    try:
+        path = path.strip()
+        
+        # Check if file already exists
+        if os.path.exists(path):
+            return f"File already exists: {path}"
 
-      return f"Empty file created successfully: {path}"
-   except FileExistsError:
-      return f"File already exists: {path}"
-   except Exception as e:
-      return f"Error creating file '{path}': {str(e)}"
+        # Create empty file (x mode avoids overwrite)
+        with open(path, "x", encoding="utf-8") as f:
+            pass
+
+        return f"Empty file created successfully: {path}"
+
+    except FileExistsError:
+        return f"File already exists: {path}"
+    except Exception as e:
+        return f"Error creating file '{path}': {str(e)}"
+
 
 @tool
-def write_content(input_json: str) -> str:
+def write_content(input_json: str) -> str: 
     """
     Writes content to a file.
     The input MUST be a single JSON string with 'path' and 'content' keys.
@@ -69,7 +71,7 @@ def write_content(input_json: str) -> str:
     except json.JSONDecodeError:
         return f"Error: Invalid JSON format. Expected a JSON string. Received: {input_json}"
     except Exception as e:
-        # This will catch validation errors (like missing keys) and file errors
+       
         return f"Error processing write_content: {str(e)}"
    
 
@@ -85,6 +87,7 @@ def create_folder (path:str)-> str:
     Returns a success message or error.
    """
    try:
+       path = path.strip()
        os.makedirs(path,exist_ok=True)
        return f" Folder created or already exists: {path}"
    except Exception as e:
