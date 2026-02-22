@@ -8,7 +8,7 @@ from langchain_openai import ChatOpenAI
 load_dotenv()
 def create_agent():
    prompt= load_prompt('prompt.json')
-   llm2 = ChatOpenAI(model="gpt-4o-mini")
+   llm2 = ChatOpenAI(model="gpt-4o-mini",temperature=0)
 
    agent = create_react_agent(
       llm = llm2,
@@ -26,7 +26,7 @@ def create_agent():
             read_file,
             create_folder,
             open_in_browser],
-      # verbose= True, if you want to see explanation
+      # verbose= True,# if you want to see explanation
       handle_parsing_errors=True
    )
    return agent_executor
